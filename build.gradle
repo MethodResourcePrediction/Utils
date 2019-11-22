@@ -19,10 +19,10 @@ repositories {
 
 dependencies {
 	// https://mvnrepository.com/artifact/com.ibm.wala/com.ibm.wala.core
-	compile group: 'com.ibm.wala', name: 'com.ibm.wala.core', version: '1.5.0'
+	compile group: 'com.ibm.wala', name: 'com.ibm.wala.core', version: '1.5.4'
 	
 	// https://mvnrepository.com/artifact/com.ibm.wala/com.ibm.wala.util
-	compile group: 'com.ibm.wala', name: 'com.ibm.wala.util', version: '1.5.0'
+	compile group: 'com.ibm.wala', name: 'com.ibm.wala.util', version: '1.5.4'
 	
 	// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
