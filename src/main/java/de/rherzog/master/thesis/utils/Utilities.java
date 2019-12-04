@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import com.ibm.wala.shrikeBT.BinaryOpInstruction;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
 import com.ibm.wala.shrikeBT.IInstruction;
+import com.ibm.wala.shrikeBT.IInvokeInstruction;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
@@ -329,6 +330,19 @@ public class Utilities {
 		return d;
 	}
 
+	public static boolean isRecursiveInvokeInstruction(MethodData methodData, IInvokeInstruction instruction) {
+		if (methodData.getClassType().compareTo(instruction.getClassType()) != 0) {
+			return false;
+		}
+		if (methodData.getName().compareTo(instruction.getMethodName()) != 0) {
+			return false;
+		}
+		if (methodData.getSignature().compareTo(instruction.getMethodSignature()) != 0) {
+			return false;
+		}
+		return true;
+	}
+
 	public static Patch getStoreTimePatch(int timeVarIndex) {
 		return new Patch() {
 			@Override
@@ -346,25 +360,60 @@ public class Utilities {
 		};
 	}
 
-	public static Patch getStoreDurationPatch(int timeStartVarIndex, int timeEndVarIndex, int timeDurationVarIndex) {
+	public static Patch getStoreCurrentTimeDurationPatch(int timeStartVarIndex, int timeDurationVarIndex) {
 		return new Patch() {
 			@Override
 			public void emitTo(Output w) {
-				// Java-Code (pseudo)
-//				public void getDuration(long start, long end) {
-//					long duration = end - start;
-//				}
+				// Java-Code
+//				long timeDuration = System.currentTimeMillis() - timeMillis;
 
 				// Bytecode
-//				LLOAD 3 [timeEndVarIndex]
+//			    INVOKESTATIC java/lang/System.currentTimeMillis()J
 //			    LLOAD 1 [timeStartVarIndex]
 //			    LSUB
-//			    LSTORE 5 [timeDurationVarIndex]
+//				LSTORE 2 [timeDurationVarIndex]
 
-				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, timeEndVarIndex));
+				w.emit(Util.makeInvoke(System.class, "currentTimeMillis", new Class[] {}));
 				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, timeStartVarIndex));
-				w.emit(BinaryOpInstruction.make(CTCompiler.TYPE_long, Operator.SUB));
+				w.emit(BinaryOpInstruction.make(CTCompiler.TYPE_long,
+						com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator.SUB));
 				w.emit(StoreInstruction.make(CTCompiler.TYPE_long, timeDurationVarIndex));
+			}
+		};
+	}
+
+	public static Patch getSubstractionPatch(int opA, int opB, int result) {
+		return new Patch() {
+			@Override
+			public void emitTo(Output w) {
+				// Bytecode
+//				LLOAD 3 [opA]
+//			    LLOAD 1 [opB]
+//			    LSUB
+//			    LSTORE 5 [result]
+
+				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, opB));
+				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, opA));
+				w.emit(BinaryOpInstruction.make(CTCompiler.TYPE_long, Operator.SUB));
+				w.emit(StoreInstruction.make(CTCompiler.TYPE_long, result));
+			}
+		};
+	}
+
+	public static Patch getAdditionPatch(int opA, int opB, int result) {
+		return new Patch() {
+			@Override
+			public void emitTo(Output w) {
+				// Bytecode
+//				LLOAD 3 [opA]
+//			    LLOAD 1 [opB]
+//			    LADD
+//			    LSTORE 5 [result]
+
+				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, opB));
+				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, opA));
+				w.emit(BinaryOpInstruction.make(CTCompiler.TYPE_long, Operator.ADD));
+				w.emit(StoreInstruction.make(CTCompiler.TYPE_long, result));
 			}
 		};
 	}
