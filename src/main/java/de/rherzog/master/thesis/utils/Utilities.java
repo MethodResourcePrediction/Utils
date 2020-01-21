@@ -5,8 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -23,21 +28,21 @@ import com.ibm.wala.shrikeBT.BinaryOpInstruction;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
 import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction;
+import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
+import com.ibm.wala.shrikeBT.ILoadInstruction;
+import com.ibm.wala.shrikeBT.IStoreInstruction;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
-import com.ibm.wala.shrikeBT.StoreInstruction;
-import com.ibm.wala.shrikeBT.Util;
-import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
+import com.ibm.wala.shrikeBT.StoreInstruction;
+import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.shrikeCT.CTCompiler;
 import com.ibm.wala.shrikeBT.shrikeCT.CTDecoder;
-import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.types.generics.BaseType;
 import com.ibm.wala.types.generics.TypeSignature;
-import com.ibm.wala.util.strings.StringStuff;
 
 public class Utilities {
 	/**
@@ -117,8 +122,9 @@ public class Utilities {
 	 * @param instructions
 	 * @return max variable index for method (in all instructions)
 	 */
-	public static int getMaxLocalVarIndex(MethodData methodData, IInstruction[] instructions) {
+	public static int getMaxLocalVarIndex(MethodData methodData) {
 		int maxIndex = 0;
+		IInstruction[] instructions = methodData.getInstructions();
 
 		// Search for the biggest variable index
 		for (IInstruction instruction : instructions) {
@@ -134,14 +140,9 @@ public class Utilities {
 				}
 			}
 		}
-		maxIndex += 1; // For non-static methods => 0 is [this]
 
-		// Increment by the number of parameters as well
-		final TypeName[] parameterNames = StringStuff.parseForParameterNames(methodData.getSignature());
-		if (parameterNames != null) {
-			maxIndex += parameterNames.length;
-		}
-		return maxIndex + 10;
+		// To be safe, add some more
+		return maxIndex;
 	}
 
 	public static void correctJarManifests(final String jarFileIn, final String jarFileOut)
@@ -424,5 +425,45 @@ public class Utilities {
 			public void emitTo(Output w) {
 			}
 		};
+	}
+
+	public static IInstruction rewriteVarIndex(Map<Integer, Set<Integer>> varIndexesToRenumber,
+			IInstruction instruction, int instructionIndex) {
+		IInstruction newInstruction = instruction;
+		for (Entry<Integer, Set<Integer>> entry : varIndexesToRenumber.entrySet()) {
+			if (entry.getValue().contains(instructionIndex)) {
+				if (instruction instanceof ILoadInstruction) {
+					ILoadInstruction loadInstruction = (ILoadInstruction) instruction;
+					newInstruction = LoadInstruction.make(loadInstruction.getType(), entry.getKey());
+				} else if (instruction instanceof IStoreInstruction) {
+					IStoreInstruction storeInstruction = (IStoreInstruction) instruction;
+					newInstruction = StoreInstruction.make(storeInstruction.getType(), entry.getKey());
+				}
+				break;
+			}
+		}
+		return newInstruction;
+	}
+
+	public static void dotShow(String dotPrint) throws IOException, InterruptedException {
+		Path dir = Files.createTempDirectory("dot-");
+		dotShow(dir, dotPrint);
+	}
+
+	public static void dotShow(Path dir, String dotPrint) throws IOException, InterruptedException {
+		final String format = "png";
+		final String path = Files.createTempFile(dir, "slicer-", "." + format).toFile().getPath();
+
+		ProcessBuilder builder = new ProcessBuilder("dot", "-T" + format, "-o" + path);
+		Process process = builder.start();
+		OutputStream outputStream = process.getOutputStream();
+
+		IOUtils.write(dotPrint, outputStream, Charset.defaultCharset());
+		outputStream.close();
+
+		process.waitFor();
+
+		builder = new ProcessBuilder("xdg-open", path);
+		builder.start().waitFor();
 	}
 }
