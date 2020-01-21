@@ -25,6 +25,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.ibm.wala.shrikeBT.BinaryOpInstruction;
+import com.ibm.wala.shrikeBT.Constants;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
 import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction;
@@ -132,16 +133,26 @@ public class Utilities {
 				StoreInstruction instruction2 = (StoreInstruction) instruction;
 				if (instruction2.getVarIndex() > maxIndex) {
 					maxIndex = instruction2.getVarIndex();
+
+					// If the instruction has a 2-sized element type, reserve one more var index
+					String type = instruction2.getType();
+					if (type.contentEquals(Constants.TYPE_long) || type.contentEquals(Constants.TYPE_double)) {
+						maxIndex += 1;
+					}
 				}
 			} else if (instruction instanceof LoadInstruction) {
 				LoadInstruction instruction2 = (LoadInstruction) instruction;
 				if (instruction2.getVarIndex() > maxIndex) {
 					maxIndex = instruction2.getVarIndex();
+
+					// If the instruction has a 2-sized element type, reserve one more var index
+					String type = instruction2.getType();
+					if (type.contentEquals(Constants.TYPE_long) || type.contentEquals(Constants.TYPE_double)) {
+						maxIndex += 1;
+					}
 				}
 			}
 		}
-
-		// To be safe, add some more
 		return maxIndex;
 	}
 
