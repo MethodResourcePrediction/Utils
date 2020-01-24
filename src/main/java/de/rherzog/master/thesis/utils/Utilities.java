@@ -28,6 +28,7 @@ import com.ibm.wala.shrikeBT.BinaryOpInstruction;
 import com.ibm.wala.shrikeBT.ConstantInstruction;
 import com.ibm.wala.shrikeBT.Constants;
 import com.ibm.wala.shrikeBT.DupInstruction;
+import com.ibm.wala.shrikeBT.GotoInstruction;
 import com.ibm.wala.shrikeBT.IArrayLoadInstruction;
 import com.ibm.wala.shrikeBT.IArrayStoreInstruction;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction;
@@ -561,6 +562,11 @@ public class Utilities {
 			// TODO Usually consumes 2 elements but what about a primitive array?
 //			return getWordSizeByType(instruction.getType());
 			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof GotoInstruction) {
+//			GotoInstruction instruction = (GotoInstruction) iInstruction;
+			// A goto instruction does never pop anything
+			return 0;
 		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());
 	}
