@@ -71,6 +71,22 @@ public class Statistics {
 		return data[data.length / 2];
 	}
 
+	public double minimum() {
+		double min = Double.MAX_VALUE;
+		for (double d : data) {
+			min = Math.min(min, d);
+		}
+		return min;
+	}
+
+	public double maximum() {
+		double max = Double.MIN_VALUE;
+		for (double d : data) {
+			max = Math.max(max, d);
+		}
+		return max;
+	}
+
 	public double precision(Statistics statistics) {
 		return 0d;
 	}

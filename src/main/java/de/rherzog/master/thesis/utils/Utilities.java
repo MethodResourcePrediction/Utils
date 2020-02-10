@@ -24,6 +24,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.ibm.wala.shrikeBT.ArrayLengthInstruction;
 import com.ibm.wala.shrikeBT.BinaryOpInstruction;
 import com.ibm.wala.shrikeBT.ConstantInstruction;
 import com.ibm.wala.shrikeBT.Constants;
@@ -567,6 +568,10 @@ public class Utilities {
 //			GotoInstruction instruction = (GotoInstruction) iInstruction;
 			// A goto instruction does never pop anything
 			return 0;
+		}
+		if (iInstruction instanceof ArrayLengthInstruction) {
+			ArrayLengthInstruction instruction = (ArrayLengthInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
 		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());
 	}
