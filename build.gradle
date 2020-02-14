@@ -20,7 +20,9 @@ repositories {
 dependencies {
 	compile files(
 		'../WALA/com.ibm.wala.core-1.5.5-SNAPSHOT.jar',
-		'../WALA/com.ibm.wala.shrike-1.5.5-SNAPSHOT.jar'
+		'../WALA/com.ibm.wala.shrike-1.5.5-SNAPSHOT.jar',
+		'../WALA/com.ibm.wala.util-1.5.5-SNAPSHOT.jar',
+		'../Annotations.jar',
 	)
 	
 	// https://mvnrepository.com/artifact/com.ibm.wala/com.ibm.wala.core
