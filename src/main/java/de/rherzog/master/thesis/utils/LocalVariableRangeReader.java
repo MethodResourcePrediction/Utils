@@ -8,6 +8,7 @@ import java.util.List;
 import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.annotations.TypeAnnotation;
+import com.ibm.wala.util.collections.Pair;
 
 public class LocalVariableRangeReader {
 	private List<TypeAnnotation> typeAnnotations;
@@ -29,6 +30,20 @@ public class LocalVariableRangeReader {
 		this.typeAnnotations = annotations;
 
 		getLocalVariableRanges();
+	}
+
+	public Pair<Double, Double> getRange(int varIndex) {
+		Pair<Double, Double> range = null;
+		for (LocalVariableRange localVariableRange : getLocalVariableRanges()) {
+			if (localVariableRange.getVarIndex() == varIndex) {
+				if (range != null) {
+					throw new UnsupportedOperationException(
+							"Duplicate annotation range found for varIndex " + varIndex);
+				}
+				range = localVariableRange.getRange();
+			}
+		}
+		return range;
 	}
 
 	public List<LocalVariableRange> getLocalVariableRanges() {

@@ -7,6 +7,7 @@ import com.ibm.wala.shrikeCT.TypeAnnotationsReader.TargetType;
 import com.ibm.wala.types.annotations.Annotation;
 import com.ibm.wala.types.annotations.TypeAnnotation;
 import com.ibm.wala.types.annotations.TypeAnnotation.LocalVarTarget;
+import com.ibm.wala.util.collections.Pair;
 
 import de.rherzog.master.thesis.annotations.Range;
 
@@ -77,6 +78,10 @@ public class LocalVariableRange {
 		String valueString = elementValue.toString();
 		max = Double.parseDouble(valueString);
 		return max;
+	}
+	
+	public Pair<Double, Double> getRange() {
+		return Pair.make(getMin(), getMax());
 	}
 
 	public TypeAnnotation getTypeAnnotation() {
