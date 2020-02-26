@@ -1,6 +1,7 @@
 package de.rherzog.master.thesis.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +25,11 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.ibm.wala.classLoader.ShrikeCTMethod;
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.shrikeBT.ArrayLengthInstruction;
 import com.ibm.wala.shrikeBT.BinaryOpInstruction;
 import com.ibm.wala.shrikeBT.ConstantInstruction;
@@ -33,10 +39,10 @@ import com.ibm.wala.shrikeBT.GotoInstruction;
 import com.ibm.wala.shrikeBT.IArrayLoadInstruction;
 import com.ibm.wala.shrikeBT.IArrayStoreInstruction;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction;
+import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
 import com.ibm.wala.shrikeBT.IConditionalBranchInstruction;
 import com.ibm.wala.shrikeBT.IConversionInstruction;
 import com.ibm.wala.shrikeBT.IGetInstruction;
-import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
 import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
@@ -45,11 +51,11 @@ import com.ibm.wala.shrikeBT.IStoreInstruction;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
+import com.ibm.wala.shrikeBT.MethodEditor.Output;
+import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 import com.ibm.wala.shrikeBT.NewInstruction;
 import com.ibm.wala.shrikeBT.PopInstruction;
 import com.ibm.wala.shrikeBT.ReturnInstruction;
-import com.ibm.wala.shrikeBT.MethodEditor.Output;
-import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.shrikeCT.CTCompiler;
@@ -58,6 +64,8 @@ import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.types.generics.BaseType;
 import com.ibm.wala.types.generics.TypeSignature;
+import com.ibm.wala.util.collections.Pair;
+import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.strings.StringStuff;
 
 public class Utilities {
@@ -593,5 +601,38 @@ public class Utilities {
 		default:
 			return 1;
 		}
+	}
+
+	public static Pair<Integer, IStoreInstruction> findInstructionByVarIndex(IInstruction[] instructions,
+			int varIndex) {
+		for (int i = 0; i < instructions.length; i++) {
+			IInstruction instruction2 = instructions[i];
+			if (instruction2 instanceof IStoreInstruction) {
+				IStoreInstruction storeInstruction = (IStoreInstruction) instruction2;
+				if (storeInstruction.getVarIndex() == varIndex) {
+					return Pair.make(i, storeInstruction);
+				}
+			}
+		}
+		return null;
+	}
+
+	public static ShrikeCTMethod getShrikeCTMethod(String regressionExclusions, String inputJar, String methodSignature)
+			throws IOException, ClassHierarchyException {
+		InstrumenterComparator comparator = InstrumenterComparator.of(methodSignature);
+		ShrikeCTMethod method = (ShrikeCTMethod) getClassHierarchy(regressionExclusions, inputJar)
+				.resolveMethod(comparator.getMethodReference());
+		return method;
+	}
+
+	public static ClassHierarchy getClassHierarchy(String regressionExclusions, String inputJar)
+			throws IOException, ClassHierarchyException {
+		// create an analysis scope representing the appJar as a J2SE application
+		File regressionExclusionsFile = new File(regressionExclusions);
+		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(inputJar, regressionExclusionsFile);
+
+		// build a class hierarchy, call graph, and system dependence graph
+		ClassHierarchy cha = ClassHierarchyFactory.make(scope);
+		return cha;
 	}
 }
