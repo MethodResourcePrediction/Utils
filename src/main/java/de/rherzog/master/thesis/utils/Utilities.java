@@ -635,4 +635,82 @@ public class Utilities {
 		ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 		return cha;
 	}
+
+	public static TypeSignature getInstructionType(IInstruction iInstruction) {
+		String pushedType = iInstruction.getPushedType(null);
+		if (pushedType != null) {
+			return TypeSignature.make(pushedType);
+		}
+		if (iInstruction instanceof ILoadInstruction) {
+			ILoadInstruction instruction = (ILoadInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IStoreInstruction) {
+			IStoreInstruction instruction = (IStoreInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IInvokeInstruction) {
+			IInvokeInstruction instruction = (IInvokeInstruction) iInstruction;
+			String methodSignature = instruction.getMethodSignature();
+			TypeName returnTypeName = StringStuff.parseForReturnTypeName(methodSignature);
+			return TypeSignature.make(returnTypeName.toString());
+		}
+		if (iInstruction instanceof IConditionalBranchInstruction) {
+			IConditionalBranchInstruction instruction = (IConditionalBranchInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IBinaryOpInstruction) {
+			IBinaryOpInstruction instruction = (IBinaryOpInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof ConstantInstruction) {
+			ConstantInstruction instruction = (ConstantInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IArrayLoadInstruction) {
+			IArrayLoadInstruction instruction = (IArrayLoadInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof PopInstruction) {
+//			PopInstruction instruction = (PopInstruction) iInstruction;
+			return null;
+		}
+		if (iInstruction instanceof DupInstruction) {
+//			DupInstruction instruction = (DupInstruction) iInstruction;
+			return null;
+		}
+		if (iInstruction instanceof IGetInstruction) {
+			IGetInstruction instruction = (IGetInstruction) iInstruction;
+			return TypeSignature.make(instruction.getFieldType());
+		}
+		if (iInstruction instanceof ReturnInstruction) {
+			ReturnInstruction instruction = (ReturnInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IConversionInstruction) {
+			IConversionInstruction instruction = (IConversionInstruction) iInstruction;
+			return TypeSignature.make(instruction.getToType());
+		}
+		if (iInstruction instanceof NewInstruction) {
+			NewInstruction instruction = (NewInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof IArrayStoreInstruction) {
+			IArrayStoreInstruction instruction = (IArrayStoreInstruction) iInstruction;
+			return TypeSignature.make(instruction.getType());
+		}
+		if (iInstruction instanceof GotoInstruction) {
+//			GotoInstruction instruction = (GotoInstruction) iInstruction;
+			return null;
+		}
+		if (iInstruction instanceof ArrayLengthInstruction) {
+//			ArrayLengthInstruction instruction = (ArrayLengthInstruction) iInstruction;
+			return TypeSignature.make(Constants.TYPE_int);
+		}
+		return null;
+	}
+	
+	public static boolean booleanValue(double d) {
+		return d == 0.0d;
+	}
 }
