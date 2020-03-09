@@ -119,16 +119,16 @@ public class Utilities {
 			typeReference = TypeReference.JavaLangByte;
 		} else if (baseType.getType().equals(TypeReference.Char)) {
 			typeReference = TypeReference.JavaLangCharacter;
-		} else if (baseType.getType().equals(TypeReference.Double)) {
-			typeReference = TypeReference.JavaLangDouble;
-		} else if (baseType.getType().equals(TypeReference.Float)) {
-			typeReference = TypeReference.JavaLangFloat;
+		} else if (baseType.getType().equals(TypeReference.Short)) {
+			typeReference = TypeReference.JavaLangShort;
 		} else if (baseType.getType().equals(TypeReference.Int)) {
 			typeReference = TypeReference.JavaLangInteger;
 		} else if (baseType.getType().equals(TypeReference.Long)) {
 			typeReference = TypeReference.JavaLangLong;
-		} else if (baseType.getType().equals(TypeReference.Short)) {
-			typeReference = TypeReference.JavaLangShort;
+		} else if (baseType.getType().equals(TypeReference.Float)) {
+			typeReference = TypeReference.JavaLangFloat;
+		} else if (baseType.getType().equals(TypeReference.Double)) {
+			typeReference = TypeReference.JavaLangDouble;
 		} else {
 			throw new IllegalArgumentException("Cannot convert base type [" + type + "]");
 		}
@@ -136,6 +136,34 @@ public class Utilities {
 		String methodSignature = "(" + type.toString() + ")" + clazz;
 
 		return InvokeInstruction.make(methodSignature, clazz, "valueOf", Dispatch.STATIC);
+	}
+
+	public static boolean isNumericBaseType(String type) {
+		if (Constants.TYPE_boolean.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_byte.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_char.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_short.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_int.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_long.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_float.equals(type)) {
+			return true;
+		}
+		if (Constants.TYPE_double.equals(type)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -341,7 +369,32 @@ public class Utilities {
 		return hexB64;
 	}
 
+	public static boolean isNumeric(Object value) {
+		if (value instanceof Integer) {
+			return true;
+		} else if (value instanceof Long) {
+			return true;
+		} else if (value instanceof Double) {
+			return true;
+		} else if (value instanceof Boolean) {
+			return true;
+		} else if (value instanceof Short) {
+			return true;
+		} else if (value instanceof Byte) {
+			return true;
+		} else if (value instanceof Float) {
+			return true;
+		} else if (value instanceof Character) {
+			return true;
+		}
+		return false;
+	}
+
 	public static Double convertNumericObjectToDouble(Object value) {
+		if (!isNumeric(value)) {
+			return null;
+		}
+
 		// Convert every numeric datatype to double
 		Double d = null;
 		if (value instanceof Integer) {
@@ -358,6 +411,8 @@ public class Utilities {
 			d = ((Byte) value).doubleValue();
 		} else if (value instanceof Float) {
 			d = ((Float) value).doubleValue();
+		} else if (value instanceof Character) {
+			d = Double.valueOf((Character) value).doubleValue();
 		} else {
 			// In other cases the value should be primitive
 			d = (double) value;
@@ -709,7 +764,7 @@ public class Utilities {
 		}
 		return null;
 	}
-	
+
 	public static boolean booleanValue(double d) {
 		return d == 0.0d;
 	}
