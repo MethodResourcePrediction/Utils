@@ -171,12 +171,21 @@ public class Utilities {
 	 * intended to be free for use.
 	 * 
 	 * @param methodData
-	 * @param instructions
 	 * @return max variable index for method (in all instructions)
 	 */
 	public static int getMaxLocalVarIndex(MethodData methodData) {
+		return getMaxLocalVarIndex(methodData.getInstructions());
+	}
+
+	/**
+	 * Get the maximum variable index which is in use by a method. The next one is
+	 * intended to be free for use.
+	 * 
+	 * @param instructions
+	 * @return max variable index for method (in all instructions)
+	 */
+	public static int getMaxLocalVarIndex(IInstruction[] instructions) {
 		int maxIndex = 0;
-		IInstruction[] instructions = methodData.getInstructions();
 
 		// Search for the biggest variable index
 		for (IInstruction instruction : instructions) {
@@ -370,22 +379,28 @@ public class Utilities {
 	}
 
 	public static boolean isNumeric(Object value) {
-		if (value instanceof Integer) {
-			return true;
-		} else if (value instanceof Long) {
-			return true;
-		} else if (value instanceof Double) {
-			return true;
-		} else if (value instanceof Boolean) {
-			return true;
-		} else if (value instanceof Short) {
-			return true;
-		} else if (value instanceof Byte) {
-			return true;
-		} else if (value instanceof Float) {
-			return true;
-		} else if (value instanceof Character) {
-			return true;
+		if (value == null) {
+			return false;
+		}
+		try {
+			if (value instanceof Integer) {
+				return true;
+			} else if (value instanceof Long) {
+				return true;
+			} else if (value instanceof Double) {
+				return true;
+			} else if (value instanceof Boolean) {
+				return true;
+			} else if (value instanceof Short) {
+				return true;
+			} else if (value instanceof Byte) {
+				return true;
+			} else if (value instanceof Float) {
+				return true;
+			} else if (value instanceof Character) {
+				return true;
+			}
+		} catch (NullPointerException e) {
 		}
 		return false;
 	}
