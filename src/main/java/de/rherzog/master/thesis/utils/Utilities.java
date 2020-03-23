@@ -55,6 +55,7 @@ import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 import com.ibm.wala.shrikeBT.NewInstruction;
 import com.ibm.wala.shrikeBT.PopInstruction;
+import com.ibm.wala.shrikeBT.PutInstruction;
 import com.ibm.wala.shrikeBT.ReturnInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 import com.ibm.wala.shrikeBT.Util;
@@ -649,6 +650,10 @@ public class Utilities {
 		}
 		if (iInstruction instanceof ArrayLengthInstruction) {
 			ArrayLengthInstruction instruction = (ArrayLengthInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof PutInstruction) {
+			PutInstruction instruction = (PutInstruction) iInstruction;
 			return (byte) instruction.getPoppedCount();
 		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());

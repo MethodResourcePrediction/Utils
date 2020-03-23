@@ -29,10 +29,10 @@ public class InstrumenterComparator {
 	public boolean equals(MethodData md) {
 		String mrClassName = classTypeName.toString();
 
-		String mdClassType = md.getClassType().toString().replaceFirst(";", "");
-//		if (mdClassType.startsWith("L")) {
-//			mdClassType = mdClassType.substring(1);
-//		}
+		String mdClassType = md.getClassType().toString();
+		if (mdClassType.endsWith(";")) {
+			mdClassType = mdClassType.substring(0, mdClassType.length() - 1);
+		}
 
 		if (!mdClassType.equals(mrClassName)) {
 			return false;
