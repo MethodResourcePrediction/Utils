@@ -572,6 +572,10 @@ public class Utilities {
 		builder.start().waitFor();
 	}
 
+	public static int getPoppedElementCount(IInstruction iInstruction) {
+		return iInstruction.getPoppedCount();
+	}
+
 	public static byte getPoppedSize(IInstruction iInstruction) {
 		if (iInstruction instanceof ILoadInstruction) {
 //			ILoadInstruction instruction = (ILoadInstruction) iInstruction;
@@ -657,6 +661,13 @@ public class Utilities {
 			return (byte) instruction.getPoppedCount();
 		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());
+	}
+
+	public static int getPushedElementCount(IInstruction iInstruction) {
+		if (iInstruction instanceof DupInstruction) {
+			return 2;
+		}
+		return iInstruction.getPushedWordSize() >= 1 ? 1 : 0;
 	}
 
 	public static byte getPushedSize(IInstruction iInstruction) {
