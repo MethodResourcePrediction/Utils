@@ -23,6 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.ibm.wala.classLoader.ShrikeCTMethod;
@@ -798,5 +799,28 @@ public class Utilities {
 
 	public static boolean booleanValue(double d) {
 		return d == 0.0d;
+	}
+
+	public static void extractFilesFromZip(String zipFilePath, String outputPath, String... zipFiles)
+			throws IOException {
+		byte[] buffer = new byte[1024];
+
+		ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath));
+		ZipEntry entry = null;
+		while ((entry = zis.getNextEntry()) != null) {
+			for (String zipFile : zipFiles) {
+				if (zipFile.equals(entry.getName())) {
+					File targetFile = new File(FilenameUtils.concat(outputPath, zipFile));
+					FileOutputStream fos = new FileOutputStream(targetFile);
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
+					fos.close();
+				}
+			}
+		}
+		zis.closeEntry();
+		zis.close();
 	}
 }
