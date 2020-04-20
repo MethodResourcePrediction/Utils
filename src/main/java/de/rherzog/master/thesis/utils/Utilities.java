@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.rmi.UnexpectedException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -822,5 +823,74 @@ public class Utilities {
 		}
 		zis.closeEntry();
 		zis.close();
+	}
+
+	public static String typeToConstantFieldSource(String type) throws UnexpectedException {
+		String constantFieldSource = "Constants.TYPE_";
+		switch (type) {
+		case Constants.TYPE_boolean:
+			constantFieldSource += "boolean";
+			break;
+		case Constants.TYPE_byte:
+			constantFieldSource += "byte";
+			break;
+		case Constants.TYPE_char:
+			constantFieldSource += "char";
+			break;
+		case Constants.TYPE_Class:
+			constantFieldSource += "Class";
+			break;
+		case Constants.TYPE_double:
+			constantFieldSource += "double";
+			break;
+		case Constants.TYPE_Error:
+			constantFieldSource += "Error";
+			break;
+		case Constants.TYPE_Exception:
+			constantFieldSource += "Exception";
+			break;
+		case Constants.TYPE_float:
+			constantFieldSource += "float";
+			break;
+		case Constants.TYPE_int:
+			constantFieldSource += "int";
+			break;
+		case Constants.TYPE_long:
+			constantFieldSource += "long";
+			break;
+		case Constants.TYPE_MethodHandle:
+			constantFieldSource += "MethodHandle";
+			break;
+		case Constants.TYPE_MethodType:
+			constantFieldSource += "MethodType";
+			break;
+		case Constants.TYPE_null:
+			constantFieldSource += "null";
+			break;
+		case Constants.TYPE_Object:
+			constantFieldSource += "Object";
+			break;
+		case Constants.TYPE_RuntimeException:
+			constantFieldSource += "RuntimeException";
+			break;
+		case Constants.TYPE_short:
+			constantFieldSource += "short";
+			break;
+		case Constants.TYPE_String:
+			constantFieldSource += "String";
+			break;
+		case Constants.TYPE_Throwable:
+			constantFieldSource += "Throwable";
+			break;
+		case Constants.TYPE_unknown:
+			constantFieldSource += "unknown";
+			break;
+		case Constants.TYPE_void:
+			constantFieldSource += "void";
+			break;
+		default:
+			throw new UnexpectedException("type " + type + " not found in WALA Constants");
+		}
+		return constantFieldSource;
 	}
 }
