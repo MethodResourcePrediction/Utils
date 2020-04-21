@@ -677,13 +677,20 @@ public class Utilities {
 			DupInstruction instruction = (DupInstruction) iInstruction;
 			return (byte) (2 * instruction.getSize());
 		}
+		if (iInstruction instanceof IInvokeInstruction) {
+			IInvokeInstruction instruction = (IInvokeInstruction) iInstruction;
+			TypeName returnTypeName = StringStuff.parseForReturnTypeName(instruction.getMethodSignature());
+			if (returnTypeName.equals(TypeName.findOrCreate(Constants.TYPE_void))) {
+				return 0;
+			}
+			return 1;
+		}
 		return iInstruction.getPushedWordSize();
 	}
 
 	public static byte getWordSizeByType(String type) {
 		switch (type) {
 		case CTCompiler.TYPE_double:
-		case CTCompiler.TYPE_float:
 		case CTCompiler.TYPE_long:
 			return 2;
 		default:
@@ -889,7 +896,8 @@ public class Utilities {
 			constantFieldSource += "void";
 			break;
 		default:
-			throw new UnexpectedException("type " + type + " not found in WALA Constants");
+			return "\"" + type + "\"";
+//			throw new UnexpectedException("type " + type + " not found in WALA Constants");
 		}
 		return constantFieldSource;
 	}
