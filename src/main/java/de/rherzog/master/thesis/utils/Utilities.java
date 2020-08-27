@@ -575,6 +575,10 @@ public class Utilities {
 	}
 
 	public static int getPoppedElementCount(IInstruction iInstruction) {
+		if (iInstruction instanceof PopInstruction) {
+			// Regardless of pop size, the number of elements popped is always 1
+			return 1;
+		}
 		return iInstruction.getPoppedCount();
 	}
 
@@ -666,9 +670,6 @@ public class Utilities {
 	}
 
 	public static int getPushedElementCount(IInstruction iInstruction) {
-		if (iInstruction instanceof DupInstruction) {
-			return 2;
-		}
 		return iInstruction.getPushedWordSize() >= 1 ? 1 : 0;
 	}
 
@@ -683,7 +684,7 @@ public class Utilities {
 			if (returnTypeName.equals(TypeName.findOrCreate(Constants.TYPE_void))) {
 				return 0;
 			}
-			return 1;
+			return Util.getWordSize(returnTypeName.toString());
 		}
 		return iInstruction.getPushedWordSize();
 	}
