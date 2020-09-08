@@ -13,12 +13,12 @@ public class InstrumenterComparator {
 	private MethodReference methodReference;
 	private TypeName classTypeName;
 
-	public static InstrumenterComparator of(String methodSignature) {
-		if (methodSignature.startsWith("L")) {
-			methodSignature = methodSignature.substring(1);
+	public static InstrumenterComparator of(String methodReference) {
+		if (methodReference.startsWith("L")) {
+			methodReference = methodReference.substring(1);
 		}
-		methodSignature = methodSignature.replaceFirst(";", "");
-		return new InstrumenterComparator(StringStuff.makeMethodReference(methodSignature));
+		methodReference = methodReference.replaceFirst(";", "");
+		return new InstrumenterComparator(StringStuff.makeMethodReference(methodReference));
 	}
 
 	public InstrumenterComparator(MethodReference methodReference) {
@@ -27,19 +27,22 @@ public class InstrumenterComparator {
 	}
 
 	public boolean equals(MethodData md) {
-		String mrClassName = classTypeName.toString();
+		String mrClassName = classTypeName.toString() + ";";
 
 		String mdClassType = md.getClassType().toString();
-		if (mdClassType.endsWith(";")) {
-			mdClassType = mdClassType.substring(0, mdClassType.length() - 1);
-		}
+//		if (mdClassType.endsWith(";")) {
+//			mdClassType = mdClassType.substring(0, mdClassType.length() - 1);
+//		}
 
+//		System.out.println(mdClassType + " <=> " + mrClassName);
 		if (!mdClassType.equals(mrClassName)) {
 			return false;
 		}
+//		System.out.println(methodReference.getName().toString() + " <=> " + md.getName());
 		if (!methodReference.getName().toString().equals(md.getName())) {
 			return false;
 		}
+//		System.out.println(md.getSignature() + " <=> " + methodReference.getSelector().getDescriptor().toString());
 		if (!md.getSignature().equals(methodReference.getSelector().getDescriptor().toString())) {
 			return false;
 		}

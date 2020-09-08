@@ -676,6 +676,9 @@ public class Utilities {
 	}
 
 	public static int getPushedElementCount(IInstruction iInstruction) {
+		if (iInstruction instanceof DupInstruction) {
+			return 2;
+		}
 		return iInstruction.getPushedWordSize() >= 1 ? 1 : 0;
 	}
 
