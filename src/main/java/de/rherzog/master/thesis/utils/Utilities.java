@@ -453,6 +453,15 @@ public class Utilities {
 		return true;
 	}
 
+	public static boolean isConstructorInvokeInstruction(NewInstruction newInstruction,
+			IInvokeInstruction invokeInstruction) {
+		// TODO Are there more possible checks like package or modules?
+		if (!newInstruction.getType().contentEquals(invokeInstruction.getClassType())) {
+			return false;
+		}
+		return invokeInstruction.getMethodName().contentEquals("<init>");
+	}
+
 	public static Patch getStoreTimePatch(int timeVarIndex) {
 		return new Patch() {
 			@Override
