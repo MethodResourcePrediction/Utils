@@ -563,15 +563,12 @@ public class Utilities {
 		return newInstruction;
 	}
 
-	public static void dotShow(String dotPrint) throws IOException, InterruptedException {
-		Path dir = Files.createTempDirectory("dot-");
-		dotShow(dir, dotPrint);
+	public static void dotWriteToFile(String path, String dotPrint) throws IOException, InterruptedException {
+		dotWriteToFile(path, dotPrint, "png");
 	}
 
-	public static void dotShow(Path dir, String dotPrint) throws IOException, InterruptedException {
-		final String format = "png";
-		final String path = Files.createTempFile(dir, "slicer-", "." + format).toFile().getPath();
-
+	public static void dotWriteToFile(String path, String dotPrint, String format)
+			throws IOException, InterruptedException {
 		ProcessBuilder builder = new ProcessBuilder("dot", "-T" + format, "-o" + path);
 		Process process = builder.start();
 		OutputStream outputStream = process.getOutputStream();
@@ -580,9 +577,35 @@ public class Utilities {
 		outputStream.close();
 
 		process.waitFor();
+	}
 
-		builder = new ProcessBuilder("xdg-open", path);
+	public static void dotShow(Path dir, String fileName, String dotPrint) throws IOException, InterruptedException {
+		final String format = "png";
+
+		final Path filePath = Path.of(dir.toString(), fileName);
+		String path = null;
+		if (!Files.exists(filePath)) {
+			path = Files.createFile(filePath).toFile().getPath();
+		} else {
+			path = filePath.toString();
+		}
+
+		dotWriteToFile(path, dotPrint, format);
+
+		ProcessBuilder builder = new ProcessBuilder("xdg-open", path);
 		builder.start().waitFor();
+	}
+
+	public static void dotShow(Path dir, String dotPrint) throws IOException, InterruptedException {
+		final String format = "png";
+		final String fileName = Files.createTempFile(dir, "dot-", "." + format).toFile().getName();
+
+		dotShow(dir, fileName, dotPrint);
+	}
+
+	public static void dotShow(String dotPrint) throws IOException, InterruptedException {
+		Path dir = Files.createTempDirectory("dot-");
+		dotShow(dir, dotPrint);
 	}
 
 	public static int getPoppedElementCount(IInstruction iInstruction) {
