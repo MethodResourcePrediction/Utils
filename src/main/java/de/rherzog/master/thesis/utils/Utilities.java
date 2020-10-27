@@ -671,7 +671,7 @@ public class Utilities {
 		}
 		if (iInstruction instanceof ReturnInstruction) {
 			ReturnInstruction instruction = (ReturnInstruction) iInstruction;
-			return (byte) instruction.getPoppedCount();
+			return (byte) getWordSizeByType(instruction.getType());
 		}
 		if (iInstruction instanceof IConversionInstruction) {
 			IConversionInstruction instruction = (IConversionInstruction) iInstruction;
@@ -732,6 +732,8 @@ public class Utilities {
 
 	public static byte getWordSizeByType(String type) {
 		switch (type) {
+		case CTCompiler.TYPE_void:
+			return 0;
 		case CTCompiler.TYPE_double:
 		case CTCompiler.TYPE_long:
 			return 2;
