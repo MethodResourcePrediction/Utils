@@ -1,4 +1,4 @@
-package de.rherzog.master.thesis.utils;
+package de.uniks.vs.methodresourceprediction.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

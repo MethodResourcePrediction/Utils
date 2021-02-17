@@ -1,3 +1,4 @@
+package de.uniks.vs.methodresourceprediction.utils.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -11,9 +12,9 @@ import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.annotations.TypeAnnotation;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 
-import de.rherzog.master.thesis.utils.InstrumenterComparator;
-import de.rherzog.master.thesis.utils.LocalVariableRange;
-import de.rherzog.master.thesis.utils.LocalVariableRangeReader;
+import de.uniks.vs.methodresourceprediction.utils.InstrumenterComparator;
+import de.uniks.vs.methodresourceprediction.utils.LocalVariableRange;
+import de.uniks.vs.methodresourceprediction.utils.LocalVariableRangeReader;
 
 public class AnnotationsTest {
 	final String inputJar = "../EvaluationPrograms.jar";

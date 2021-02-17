@@ -1,4 +1,4 @@
-package de.rherzog.master.thesis.utils;
+package de.uniks.vs.methodresourceprediction.utils;
 
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.shrikeBT.MethodData;

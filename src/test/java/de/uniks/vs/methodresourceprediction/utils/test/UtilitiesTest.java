@@ -1,14 +1,11 @@
-import static org.junit.Assert.*;
+package de.uniks.vs.methodresourceprediction.utils.test;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import org.junit.Test;
 
 import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
-
-import de.rherzog.master.thesis.utils.Utilities;
 
 public class UtilitiesTest {
 

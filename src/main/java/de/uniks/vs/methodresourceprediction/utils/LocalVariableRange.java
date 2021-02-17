@@ -1,4 +1,4 @@
-package de.rherzog.master.thesis.utils;
+package de.uniks.vs.methodresourceprediction.utils;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import com.ibm.wala.types.annotations.TypeAnnotation;
 import com.ibm.wala.types.annotations.TypeAnnotation.LocalVarTarget;
 import com.ibm.wala.util.collections.Pair;
 
-import de.rherzog.master.thesis.annotations.Range;
+import de.uniks.vs.methodresourceprediction.annotations.Range;
 
 public class LocalVariableRange {
 	private TypeAnnotation typeAnnotation;

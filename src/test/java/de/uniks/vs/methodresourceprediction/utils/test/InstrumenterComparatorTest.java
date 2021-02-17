@@ -1,8 +1,7 @@
-import static org.junit.Assert.*;
+package de.uniks.vs.methodresourceprediction.utils.test;
 
+import de.uniks.vs.methodresourceprediction.utils.InstrumenterComparator;
 import org.junit.Test;
-
-import de.rherzog.master.thesis.utils.InstrumenterComparator;
 
 public class InstrumenterComparatorTest {
 
