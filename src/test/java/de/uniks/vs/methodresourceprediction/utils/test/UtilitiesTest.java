@@ -1,19 +1,30 @@
 package de.uniks.vs.methodresourceprediction.utils.test;
 
-import java.io.IOException;
-
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import de.uniks.vs.methodresourceprediction.utils.Utilities;
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.ibm.wala.classLoader.ShrikeCTMethod;
-import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 public class UtilitiesTest {
 
-	@Test
-	public void testGetCTMethodbySignature() throws ClassHierarchyException, IOException {
-//		ShrikeCTMethod shrikeCTMethod = Utilities.getShrikeCTMethod("../Profiler/Java60RegressionExclusions.txt",
-//				"../EvaluationPrograms.jar", "LBubbleSort;.bubble_srt([I)V");
-//		Objects.requireNonNull(shrikeCTMethod);
-	}
+  @Test
+  public void testGetCTMethodbySignature() throws ClassHierarchyException, IOException {
+    final String PREFIX = "org.gradle.wrapper.";
 
+    List<String> methodSignatures =
+        Utilities.getMethodSignatures(
+            "Java60RegressionExclusions.txt", "gradle/wrapper/gradle-wrapper.jar");
+    Objects.requireNonNull(methodSignatures);
+    Assert.assertTrue(methodSignatures.size() > 0);
+
+    for (String methodSignature : methodSignatures) {
+      if (methodSignature.startsWith(PREFIX)) {
+        System.out.println(methodSignature);
+      }
+    }
+  }
 }

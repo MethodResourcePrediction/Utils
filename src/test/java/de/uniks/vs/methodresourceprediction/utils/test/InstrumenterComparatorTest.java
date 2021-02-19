@@ -7,7 +7,7 @@ public class InstrumenterComparatorTest {
 
 	@Test
 	public void test() {
-		InstrumenterComparator comparator = InstrumenterComparator.of("LSleep;.y([Ljava/lang/String;)V");
+		InstrumenterComparator comparator = InstrumenterComparator.of("LSleep.y([Ljava/lang/String;)V");
 	}
 
 }

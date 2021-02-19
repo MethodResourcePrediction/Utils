@@ -6,6 +6,7 @@ import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.MethodReference;
+import com.ibm.wala.types.Selector;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.strings.StringStuff;
 
@@ -17,7 +18,11 @@ public class InstrumenterComparator {
 		if (methodReference.startsWith("L")) {
 			methodReference = methodReference.substring(1);
 		}
-		methodReference = methodReference.replaceFirst(";", "");
+		String methodName = methodReference.substring(0, methodReference.indexOf('('));
+//		String desc = methodReference.substring(methodReference.indexOf('('));
+		if (methodName.contains(";")) {
+		  	methodReference = methodReference.replaceFirst(";", "");
+		}
 		return new InstrumenterComparator(StringStuff.makeMethodReference(methodReference));
 	}
 

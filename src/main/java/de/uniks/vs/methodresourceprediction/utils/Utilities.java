@@ -11,15 +11,18 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.UnexpectedException;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.shrikeBT.*;
+import com.ibm.wala.types.Selector;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -32,37 +35,10 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
-import com.ibm.wala.shrikeBT.ArrayLengthInstruction;
-import com.ibm.wala.shrikeBT.BinaryOpInstruction;
-import com.ibm.wala.shrikeBT.ComparisonInstruction;
-import com.ibm.wala.shrikeBT.ConstantInstruction;
-import com.ibm.wala.shrikeBT.Constants;
-import com.ibm.wala.shrikeBT.DupInstruction;
-import com.ibm.wala.shrikeBT.GotoInstruction;
-import com.ibm.wala.shrikeBT.IArrayLoadInstruction;
-import com.ibm.wala.shrikeBT.IArrayStoreInstruction;
-import com.ibm.wala.shrikeBT.IBinaryOpInstruction;
 import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
-import com.ibm.wala.shrikeBT.IComparisonInstruction;
-import com.ibm.wala.shrikeBT.IConditionalBranchInstruction;
-import com.ibm.wala.shrikeBT.IConversionInstruction;
-import com.ibm.wala.shrikeBT.IGetInstruction;
-import com.ibm.wala.shrikeBT.IInstruction;
-import com.ibm.wala.shrikeBT.IInvokeInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
-import com.ibm.wala.shrikeBT.ILoadInstruction;
-import com.ibm.wala.shrikeBT.IStoreInstruction;
-import com.ibm.wala.shrikeBT.InvokeInstruction;
-import com.ibm.wala.shrikeBT.LoadInstruction;
-import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
-import com.ibm.wala.shrikeBT.NewInstruction;
-import com.ibm.wala.shrikeBT.PopInstruction;
-import com.ibm.wala.shrikeBT.PutInstruction;
-import com.ibm.wala.shrikeBT.ReturnInstruction;
-import com.ibm.wala.shrikeBT.StoreInstruction;
-import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.shrikeCT.CTCompiler;
 import com.ibm.wala.shrikeBT.shrikeCT.CTDecoder;
 import com.ibm.wala.types.TypeName;
@@ -73,11 +49,13 @@ import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.strings.StringStuff;
 
+import javax.management.monitor.Monitor;
+
 public class Utilities {
 	/**
 	 * Converts a {@code Class} to a Type string. For example: "String" =>
 	 * "Ljava/lang/String;"
-	 * 
+	 *
 	 * @param clazz
 	 * @return type equivalent to the class
 	 */
@@ -89,7 +67,7 @@ public class Utilities {
 	/**
 	 * Instructs a conversion from primitive type to {@code Object}. Example: "I" =>
 	 * "Ljava/lang/Integer".
-	 * 
+	 *
 	 * @param w    - Method writer
 	 * @param type - Type of stacks top-most element
 	 */
@@ -105,9 +83,9 @@ public class Utilities {
 	 * Return an {@code InvokeInstruction} for a given base type (int, long, float,
 	 * ...) which converts the base type into an {@code Object}. If the given
 	 * {@code type} is not a base type, the return value is {@code null}
-	 * 
+	 *
 	 * @see com.ibm.wala.types.TypeReference
-	 * 
+	 *
 	 * @param type TypeSignature
 	 * @return InvokeInstruction or null if the type is not a base type
 	 */
@@ -174,7 +152,7 @@ public class Utilities {
 	/**
 	 * Get the maximum variable index which is in use by a method. The next one is
 	 * intended to be free for use.
-	 * 
+	 *
 	 * @param methodData
 	 * @return max variable index for method (in all instructions)
 	 */
@@ -185,7 +163,7 @@ public class Utilities {
 	/**
 	 * Get the maximum variable index which is in use by a method. The next one is
 	 * intended to be free for use.
-	 * 
+	 *
 	 * @param instructions
 	 * @return max variable index for method (in all instructions)
 	 */
@@ -232,7 +210,7 @@ public class Utilities {
 	 * This method recalculates all specified SHA1-Digest's inside MANIFEST.MF and
 	 * deletes all other files (for example signature files)
 	 * </p>
-	 * 
+	 *
 	 * @param jarFileIn  the jar file to read
 	 * @param jarFileOut the corrected jar file to write
 	 * @throws IOException      if a file cannot be read/written
@@ -342,7 +320,7 @@ public class Utilities {
 	/**
 	 * Reads out a file from a given jar-Path and calculates its HEX-Base64 digest
 	 * representation
-	 * 
+	 *
 	 * @param jarFilePath the jar file where the file can be found
 	 * @param fileName    the name of file from which the digest is requested
 	 * @return HEX-Base64 digest of "name"
@@ -704,6 +682,14 @@ public class Utilities {
 			ComparisonInstruction instruction = (ComparisonInstruction) iInstruction;
 			return (byte) (2 * getWordSizeByType(instruction.getType()));
 		}
+		if (iInstruction instanceof ThrowInstruction) {
+			ThrowInstruction instruction = (ThrowInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof MonitorInstruction) {
+			MonitorInstruction instruction = (MonitorInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());
 	}
 
@@ -762,6 +748,24 @@ public class Utilities {
 		ShrikeCTMethod method = (ShrikeCTMethod) getClassHierarchy(regressionExclusions, inputJar)
 				.resolveMethod(comparator.getMethodReference());
 		return method;
+	}
+
+	public static List<IMethod> getMethods(String regressionExclusions, String inputJar)
+			throws IOException, ClassHierarchyException {
+		List<IMethod> iMethodList = new ArrayList<>();
+		for (IClass iClass : getClassHierarchy(regressionExclusions, inputJar)) {
+			iMethodList.addAll(iClass.getAllMethods());
+		}
+		return iMethodList;
+	}
+
+	public static List<String> getMethodSignatures(String regressionExclusions, String inputJar)
+			throws IOException, ClassHierarchyException {
+		List<String> signatures = new ArrayList<>();
+		getMethods(regressionExclusions, inputJar).forEach(method ->
+				signatures.add(Selector.make(method.getSignature()).toString())
+		);
+		return signatures;
 	}
 
 	public static ClassHierarchy getClassHierarchy(String regressionExclusions, String inputJar)
