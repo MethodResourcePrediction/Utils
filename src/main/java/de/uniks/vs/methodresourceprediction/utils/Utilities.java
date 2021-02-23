@@ -594,6 +594,14 @@ public class Utilities {
 		return iInstruction.getPoppedCount();
 	}
 
+	public static int getPoppedElementCountForDupInstruction(DupInstruction dupInstruction, boolean singleSized) {
+		if (singleSized) {
+			return dupInstruction.getSize();
+		} else {
+			return 1;
+		}
+	}
+
 	public static byte getPoppedSize(IInstruction iInstruction) {
 		if (iInstruction instanceof ILoadInstruction) {
 //			ILoadInstruction instruction = (ILoadInstruction) iInstruction;
@@ -641,7 +649,7 @@ public class Utilities {
 		}
 		if (iInstruction instanceof DupInstruction) {
 			DupInstruction instruction = (DupInstruction) iInstruction;
-			return (byte) instruction.getPoppedCount();
+			return (byte) instruction.getSize();
 		}
 		if (iInstruction instanceof IGetInstruction) {
 			IGetInstruction instruction = (IGetInstruction) iInstruction;
@@ -690,12 +698,40 @@ public class Utilities {
 			MonitorInstruction instruction = (MonitorInstruction) iInstruction;
 			return (byte) instruction.getPoppedCount();
 		}
+		if (iInstruction instanceof CheckCastInstruction) {
+			CheckCastInstruction instruction = (CheckCastInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof InstanceofInstruction) {
+			InstanceofInstruction instruction = (InstanceofInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof SwitchInstruction) {
+			SwitchInstruction instruction = (SwitchInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof UnaryOpInstruction) {
+			UnaryOpInstruction instruction = (UnaryOpInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
+		if (iInstruction instanceof IShiftInstruction) {
+			IShiftInstruction instruction = (IShiftInstruction) iInstruction;
+			return (byte) instruction.getPoppedCount();
+		}
 		throw new UnsupportedOperationException("Unhandled instruction type " + iInstruction.getClass().getName());
+	}
+
+	public static int getPoppedSizeForDupInstruction(DupInstruction dupInstruction, boolean singleSized) {
+		if (singleSized) {
+			return dupInstruction.getSize();
+		} else {
+			return 2 * dupInstruction.getSize();
+		}
 	}
 
 	public static int getPushedElementCount(IInstruction iInstruction) {
 		if (iInstruction instanceof DupInstruction) {
-			return 2;
+			return 2 * ((DupInstruction) iInstruction).getSize();
 		}
 		return iInstruction.getPushedWordSize() >= 1 ? 1 : 0;
 	}
@@ -948,5 +984,31 @@ public class Utilities {
 //			throw new UnexpectedException("type " + type + " not found in WALA Constants");
 		}
 		return constantFieldSource;
+	}
+
+	public static Map<Integer, Set<String>> getInstructionExceptions(IInstruction[] instructions, ExceptionHandler[][] exceptionHandlers) {
+		// Precompute exception handlers
+		Map<Integer, Set<String>> instructionExceptions = new HashMap<>();
+		for (int index = 0; index < instructions.length; index++) {
+			// Handle exceptions
+			ExceptionHandler[] instructionExceptionHandlers = exceptionHandlers[index];
+			for (ExceptionHandler instructionExceptionHandler : instructionExceptionHandlers) {
+				int handler = instructionExceptionHandler.getHandler();
+				String catchClass = instructionExceptionHandler.getCatchClass();
+				if (Objects.isNull(catchClass)) {
+					// TODO Meaningful?
+					catchClass = "";
+				}
+
+				if (!instructionExceptions.containsKey(handler)) {
+					instructionExceptions.put(handler, Set.of(catchClass));
+				} else {
+					Set<String> exceptionClasses = new LinkedHashSet<>(instructionExceptions.get(handler));
+					exceptionClasses.add(catchClass);
+					instructionExceptions.replace(handler, exceptionClasses);
+				}
+			}
+		}
+		return instructionExceptions;
 	}
 }
