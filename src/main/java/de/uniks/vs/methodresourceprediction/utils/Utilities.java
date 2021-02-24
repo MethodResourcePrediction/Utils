@@ -438,10 +438,18 @@ public class Utilities {
 		String newInstructionClassType = newInstruction.getType();
 		String invokeInstructionClassType = invokeInstruction.getClassType();
 
+		if (isNumericBaseType(newInstructionClassType)) {
+			return false;
+		}
 		String readableClassType = StringStuff.jvmToReadableType(newInstructionClassType);
 		int endIndex = readableClassType.indexOf(';');
 		if (endIndex >= 0) {
 		  	readableClassType = readableClassType.substring(0, endIndex);
+		}
+
+
+		if (isNumericBaseType(invokeInstructionClassType)) {
+			return false;
 		}
 		String invokeClassType = StringStuff.jvmToReadableType(invokeInstructionClassType);
 		endIndex = invokeClassType.indexOf(';');
@@ -463,10 +471,17 @@ public class Utilities {
 		String loadInstructionClassType = loadInstruction.getType();
 		String invokeInstructionClassType = invokeInstruction.getClassType();
 
+		if (isNumericBaseType(loadInstructionClassType)) {
+			return false;
+		}
 		String readableClassType = StringStuff.jvmToReadableType(loadInstructionClassType);
 		int endIndex = readableClassType.indexOf(';');
 		if (endIndex >= 0) {
 			readableClassType = readableClassType.substring(0, endIndex);
+		}
+
+		if (isNumericBaseType(invokeInstructionClassType)) {
+			return false;
 		}
 		String invokeClassType = StringStuff.jvmToReadableType(invokeInstructionClassType);
 		endIndex = invokeClassType.indexOf(';');
