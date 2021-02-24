@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.UnexpectedException;
@@ -23,6 +24,7 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.shrikeBT.*;
 import com.ibm.wala.types.Selector;
+import com.ibm.wala.util.strings.ImmutableByteArray;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -431,10 +433,51 @@ public class Utilities {
 		return true;
 	}
 
-	public static boolean isConstructorInvokeInstruction(NewInstruction newInstruction,
-			IInvokeInstruction invokeInstruction) {
-		// TODO Are there more possible checks like package or modules?
-		if (!newInstruction.getType().contentEquals(invokeInstruction.getClassType())) {
+	public static boolean isInitializerInstruction(NewInstruction newInstruction,
+												   IInvokeInstruction invokeInstruction) throws ClassNotFoundException {
+		String newInstructionClassType = newInstruction.getType();
+		String invokeInstructionClassType = invokeInstruction.getClassType();
+
+		String readableClassType = StringStuff.jvmToReadableType(newInstructionClassType);
+		int endIndex = readableClassType.indexOf(';');
+		if (endIndex >= 0) {
+		  	readableClassType = readableClassType.substring(0, endIndex);
+		}
+		String invokeClassType = StringStuff.jvmToReadableType(invokeInstructionClassType);
+		endIndex = invokeClassType.indexOf(';');
+		if (endIndex >= 0) {
+			invokeClassType = invokeClassType.substring(0, endIndex);
+		}
+
+		Class<?> newClass = Class.forName(readableClassType);
+		Class<?> invokeClass = Class.forName(invokeClassType);
+
+		if (!newClass.isAssignableFrom(invokeClass)) {
+			return false;
+		}
+		return invokeInstruction.getMethodName().contentEquals("<init>");
+	}
+
+	public static boolean isInitializerInstruction(LoadInstruction loadInstruction,
+												   IInvokeInstruction invokeInstruction) throws ClassNotFoundException {
+		String loadInstructionClassType = loadInstruction.getType();
+		String invokeInstructionClassType = invokeInstruction.getClassType();
+
+		String readableClassType = StringStuff.jvmToReadableType(loadInstructionClassType);
+		int endIndex = readableClassType.indexOf(';');
+		if (endIndex >= 0) {
+			readableClassType = readableClassType.substring(0, endIndex);
+		}
+		String invokeClassType = StringStuff.jvmToReadableType(invokeInstructionClassType);
+		endIndex = invokeClassType.indexOf(';');
+		if (endIndex >= 0) {
+			invokeClassType = invokeClassType.substring(0, endIndex);
+		}
+
+		Class<?> loadClass = Class.forName(readableClassType);
+		Class<?> invokeClass = Class.forName(invokeClassType);
+
+		if (!loadClass.isAssignableFrom(invokeClass)) {
 			return false;
 		}
 		return invokeInstruction.getMethodName().contentEquals("<init>");
