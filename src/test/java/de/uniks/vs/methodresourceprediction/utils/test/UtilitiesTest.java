@@ -1,10 +1,10 @@
 package de.uniks.vs.methodresourceprediction.utils.test;
 
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
-import com.ibm.wala.shrikeBT.InvokeInstruction;
-import com.ibm.wala.shrikeBT.LoadInstruction;
-import com.ibm.wala.shrikeBT.NewInstruction;
-import com.ibm.wala.shrikeBT.Util;
+import com.ibm.wala.shrike.shrikeBT.InvokeInstruction;
+import com.ibm.wala.shrike.shrikeBT.LoadInstruction;
+import com.ibm.wala.shrike.shrikeBT.NewInstruction;
+import com.ibm.wala.shrike.shrikeBT.Util;
 import de.uniks.vs.methodresourceprediction.utils.Utilities;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,22 +18,22 @@ import static org.junit.Assert.assertTrue;
 
 public class UtilitiesTest {
 
-  @Test
-  public void testGetCTMethodbySignature() throws ClassHierarchyException, IOException {
-    final String PREFIX = "org.gradle.wrapper.";
-
-    List<String> methodSignatures =
-        Utilities.getMethodSignatures(
-            "Java60RegressionExclusions.txt", "gradle/wrapper/gradle-wrapper.jar");
-    Objects.requireNonNull(methodSignatures);
-    assertTrue(methodSignatures.size() > 0);
-
-    for (String methodSignature : methodSignatures) {
-      if (methodSignature.startsWith(PREFIX)) {
-        System.out.println(methodSignature);
-      }
-    }
-  }
+//  @Test
+//  public void testGetCTMethodbySignature() throws ClassHierarchyException, IOException {
+//    final String PREFIX = "org.gradle.wrapper.";
+//
+//    List<String> methodSignatures =
+//        Utilities.getMethodSignatures(
+//            "Java60RegressionExclusions.txt", "gradle/wrapper/gradle-wrapper.jar");
+//    Objects.requireNonNull(methodSignatures);
+//    assertTrue(methodSignatures.size() > 0);
+//
+//    for (String methodSignature : methodSignatures) {
+//      if (methodSignature.startsWith(PREFIX)) {
+//        System.out.println(methodSignature);
+//      }
+//    }
+//  }
 
   @Test
   public void testInitializerInstruction() throws ClassNotFoundException {

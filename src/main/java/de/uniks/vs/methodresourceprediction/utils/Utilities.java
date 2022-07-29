@@ -1,14 +1,36 @@
 package de.uniks.vs.methodresourceprediction.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeCTMethod;
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
+import com.ibm.wala.shrike.shrikeBT.*;
+import com.ibm.wala.shrike.shrikeBT.IBinaryOpInstruction.Operator;
+import com.ibm.wala.shrike.shrikeBT.IInvokeInstruction.Dispatch;
+import com.ibm.wala.shrike.shrikeBT.MethodEditor.Output;
+import com.ibm.wala.shrike.shrikeBT.MethodEditor.Patch;
+import com.ibm.wala.shrike.shrikeBT.shrikeCT.CTCompiler;
+import com.ibm.wala.shrike.shrikeBT.shrikeCT.CTDecoder;
+import com.ibm.wala.types.Selector;
+import com.ibm.wala.types.TypeName;
+import com.ibm.wala.types.TypeReference;
+import com.ibm.wala.types.generics.BaseType;
+import com.ibm.wala.types.generics.TypeSignature;
+import com.ibm.wala.util.collections.Pair;
+import com.ibm.wala.core.util.config.AnalysisScopeReader;
+import com.ibm.wala.core.util.strings.StringStuff;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.UnexpectedException;
@@ -19,39 +41,6 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-import com.ibm.wala.classLoader.IClass;
-import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.shrikeBT.*;
-import com.ibm.wala.types.Selector;
-import com.ibm.wala.util.strings.ImmutableByteArray;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
-import com.ibm.wala.classLoader.ShrikeCTMethod;
-import com.ibm.wala.ipa.callgraph.AnalysisScope;
-import com.ibm.wala.ipa.cha.ClassHierarchy;
-import com.ibm.wala.ipa.cha.ClassHierarchyException;
-import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
-import com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator;
-import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
-import com.ibm.wala.shrikeBT.MethodEditor.Output;
-import com.ibm.wala.shrikeBT.MethodEditor.Patch;
-import com.ibm.wala.shrikeBT.shrikeCT.CTCompiler;
-import com.ibm.wala.shrikeBT.shrikeCT.CTDecoder;
-import com.ibm.wala.types.TypeName;
-import com.ibm.wala.types.TypeReference;
-import com.ibm.wala.types.generics.BaseType;
-import com.ibm.wala.types.generics.TypeSignature;
-import com.ibm.wala.util.collections.Pair;
-import com.ibm.wala.util.config.AnalysisScopeReader;
-import com.ibm.wala.util.strings.StringStuff;
-
-import javax.management.monitor.Monitor;
 
 public class Utilities {
 	/**
@@ -531,7 +520,7 @@ public class Utilities {
 				w.emit(Util.makeInvoke(System.class, "currentTimeMillis", new Class[] {}));
 				w.emit(LoadInstruction.make(CTCompiler.TYPE_long, timeStartVarIndex));
 				w.emit(BinaryOpInstruction.make(CTCompiler.TYPE_long,
-						com.ibm.wala.shrikeBT.IBinaryOpInstruction.Operator.SUB));
+						com.ibm.wala.shrike.shrikeBT.IBinaryOpInstruction.Operator.SUB));
 				w.emit(StoreInstruction.make(CTCompiler.TYPE_long, timeDurationVarIndex));
 			}
 		};
@@ -866,11 +855,10 @@ public class Utilities {
 			throws IOException, ClassHierarchyException {
 		// create an analysis scope representing the appJar as a J2SE application
 		File regressionExclusionsFile = new File(regressionExclusions);
-		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(inputJar, regressionExclusionsFile);
+		AnalysisScope scope = AnalysisScopeReader.instance.makeJavaBinaryAnalysisScope(inputJar, regressionExclusionsFile);
 
 		// build a class hierarchy, call graph, and system dependence graph
-		ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-		return cha;
+		return ClassHierarchyFactory.make(scope);
 	}
 
 	public static TypeSignature getInstructionType(IInstruction iInstruction) {

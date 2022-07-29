@@ -1,14 +1,13 @@
 package de.uniks.vs.methodresourceprediction.utils;
 
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.shrikeBT.MethodData;
-import com.ibm.wala.shrikeBT.Util;
-import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
-import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.ibm.wala.shrike.shrikeBT.MethodData;
+import com.ibm.wala.shrike.shrikeBT.Util;
+import com.ibm.wala.shrike.shrikeBT.shrikeCT.ClassInstrumenter;
+import com.ibm.wala.shrike.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.MethodReference;
-import com.ibm.wala.types.Selector;
 import com.ibm.wala.types.TypeName;
-import com.ibm.wala.util.strings.StringStuff;
+import com.ibm.wala.core.util.strings.StringStuff;
 
 public class InstrumenterComparator {
 	private MethodReference methodReference;

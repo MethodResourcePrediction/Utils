@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.ibm.wala.classLoader.ShrikeCTMethod;
-import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.ibm.wala.shrike.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.annotations.TypeAnnotation;
 import com.ibm.wala.util.collections.Pair;
 

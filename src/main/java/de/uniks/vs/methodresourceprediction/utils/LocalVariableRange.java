@@ -2,8 +2,8 @@ package de.uniks.vs.methodresourceprediction.utils;
 
 import java.util.Map;
 
-import com.ibm.wala.shrikeCT.AnnotationsReader.ElementValue;
-import com.ibm.wala.shrikeCT.TypeAnnotationsReader.TargetType;
+import com.ibm.wala.shrike.shrikeCT.AnnotationsReader.ElementValue;
+import com.ibm.wala.shrike.shrikeCT.TypeAnnotationsReader.TargetType;
 import com.ibm.wala.types.annotations.Annotation;
 import com.ibm.wala.types.annotations.TypeAnnotation;
 import com.ibm.wala.types.annotations.TypeAnnotation.LocalVarTarget;

@@ -8,10 +8,10 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
-import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.ibm.wala.shrike.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.annotations.TypeAnnotation;
-import com.ibm.wala.util.config.AnalysisScopeReader;
 
+import com.ibm.wala.core.util.config.AnalysisScopeReader;
 import de.uniks.vs.methodresourceprediction.utils.InstrumenterComparator;
 import de.uniks.vs.methodresourceprediction.utils.LocalVariableRange;
 import de.uniks.vs.methodresourceprediction.utils.LocalVariableRangeReader;
@@ -28,7 +28,7 @@ public class AnnotationsTest {
 	public void annotation() throws IOException, ClassHierarchyException, InvalidClassFileException {
 		// create an analysis scope representing the appJar as a J2SE application
 		File regressionExclusionsFile = new File("Java60RegressionExclusions.txt");
-		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(inputJar, regressionExclusionsFile);
+		AnalysisScope scope = AnalysisScopeReader.instance.makeJavaBinaryAnalysisScope(inputJar, regressionExclusionsFile);
 
 		// build a class hierarchy, call graph, and system dependence graph
 		ClassHierarchy cha = ClassHierarchyFactory.make(scope);
